@@ -1,0 +1,26 @@
+{
+  "name": "find-java",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.8.3",
+    "@types/node-fetch": "^2.6.6",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.51.0"
+  },
+  "dependencies": {
+    "extract-zip": "^2.0.1",
+    "node-fetch": "^2.7.0"
+  }
+}
