@@ -98,21 +98,26 @@ export default async function findJava(
   if (javaHome) {
     const javaHomePath = path.join(javaHome, 'bin');
     const isValid = isValidJavaInstallation(javaHome, targetVersion);
-    if (isValid) return path.join(javaHomePath, javaExecutable);
+    // if (isValid) return path.join(javaHomePath, javaExecutable);
   }
 
   // Getting thin on the ground, lets check the javaPath.
   const isMainJavaValid = isValidJavaInstallation('', targetVersion);
-  if (isMainJavaValid) return javaExecutable;
+  // if (isMainJavaValid) return javaExecutable;
 
-  const downloadedJavaPath = path.join(downloadPath, 'bin', javaExecutable);
+  const downloadedJavaPath = path.join(
+    downloadPath,
+    'java-' + targetVersion.optimal,
+    'bin'
+  );
 
   const isDownloadedJavaValid = isValidJavaInstallation(
     downloadedJavaPath,
     targetVersion
   );
-  if (isDownloadedJavaValid) return downloadedJavaPath;
+  if (isDownloadedJavaValid)
+    return path.join(downloadedJavaPath, javaExecutable);
 
   await downloadJava(targetVersion, tempPath, downloadPath, progressCallback);
-  return downloadedJavaPath;
+  return path.join(downloadedJavaPath, javaExecutable);
 }

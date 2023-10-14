@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import path from 'path';
 import { JavaVersion } from '.';
 import fs from 'fs';
-import extract from 'extract-zip';
+import AdmZip from 'adm-zip';
 
 type AdoptiumResponse = {
   binary: {
@@ -147,24 +147,25 @@ export async function downloadJava(
     downloadResponse.body.pipe(fileStream);
   });
 
-  await extractFolderFromZip(filePath, name, javaPath);
+  await extractFolderFromZip(filePath, name, javaPath, targetVersion.optimal);
 
-  fs.unlinkSync(filePath);
+  console.log(filePath);
 }
 
 async function extractFolderFromZip(
   zipPath: string,
   folderInZip: string,
-  target: string
+  target: string,
+  javaVersion: number
 ) {
-  const extractLocation = path.join(path.resolve(target), '..');
+  const extractLocation = path.resolve(target);
 
-  console.log('extractLocation', extractLocation);
-  console.log('folderInZip', folderInZip);
-  console.log('zipPath', zipPath);
+  const zip = new AdmZip(zipPath);
+  zip.extractAllTo(extractLocation, true);
+  fs.unlinkSync(zipPath);
 
-  await extract(zipPath, { dir: extractLocation });
-  const extractedFolderPath = path.join(path.join(target, '..'), folderInZip);
-  const newFolderPath = target;
+  const extractedFolderPath = path.join(extractLocation, folderInZip);
+
+  const newFolderPath = path.join(target, 'java-' + javaVersion);
   fs.renameSync(extractedFolderPath, newFolderPath);
 }
