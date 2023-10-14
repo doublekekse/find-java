@@ -89,7 +89,7 @@ export default async function findJava(
         'Packages/Microsoft.4297127D64EC6_8wekyb3d8bbwe/LocalCache/Local/'
       );
       const mcJava = tryMinecraftJava(minecraftUwpJavaPath, targetVersion);
-      // if (mcJava) return path.join(mcJava, javaExecutable);
+      if (mcJava) return path.join(mcJava, javaExecutable);
     }
   }
 
@@ -98,12 +98,12 @@ export default async function findJava(
   if (javaHome) {
     const javaHomePath = path.join(javaHome, 'bin');
     const isValid = isValidJavaInstallation(javaHome, targetVersion);
-    // if (isValid) return path.join(javaHomePath, javaExecutable);
+    if (isValid) return path.join(javaHomePath, javaExecutable);
   }
 
   // Getting thin on the ground, lets check the javaPath.
   const isMainJavaValid = isValidJavaInstallation('', targetVersion);
-  // if (isMainJavaValid) return javaExecutable;
+  if (isMainJavaValid) return javaExecutable;
 
   const downloadedJavaPath = path.join(
     downloadPath,

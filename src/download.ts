@@ -148,8 +148,6 @@ export async function downloadJava(
   });
 
   await extractFolderFromZip(filePath, name, javaPath, targetVersion.optimal);
-
-  console.log(filePath);
 }
 
 async function extractFolderFromZip(
