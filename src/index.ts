@@ -3,13 +3,31 @@ import path from 'path';
 import fs from 'fs';
 import { execSync } from 'child_process';
 import extension from './extension';
-import { ProgressCallback, downloadJava } from './download';
+import { downloadJava, ProgressCallback } from './download';
 
 export type JavaVersion = {
+  /**
+   * The optimal java version. Will be used to download java if no valid installation could be found
+   * If min and max are not set it will only accept java installations with this exact version
+   *
+   * @type {number}
+   */
   optimal: number;
-  min?: number;
-  max?: number;
-};
+} & (
+  | {
+      min?: number;
+      max?: number;
+    }
+  | {
+      /**
+       * A function to resolve weather a java installation is valid. Use this if the min, max and optimal options are not enough
+       *
+       * @param {string} dir The directory the java executable is in (e.g. "C:\Program Files\Java\jdk-18.0.2.1\bin")
+       * @param {string} file The filename (e.g. "javaw.exe" or "javaw")
+       */
+      isValid: (dir: string, file: string) => boolean;
+    }
+);
 
 function getJavaVersion(javaPath: string) {
   if (!javaPath.startsWith('javaw') && !fs.existsSync(javaPath)) return null;
@@ -28,6 +46,9 @@ function getJavaVersion(javaPath: string) {
 
 function isValidJavaInstallation(javaPath: string, targetVersion: JavaVersion) {
   const file = 'javaw' + extension();
+
+  if ('isValid' in targetVersion) return targetVersion.isValid(javaPath, file);
+
   const javaVersion = getJavaVersion(path.join(javaPath, file));
 
   if (!javaVersion) return false;
@@ -35,8 +56,9 @@ function isValidJavaInstallation(javaPath: string, targetVersion: JavaVersion) {
   if (targetVersion.min && targetVersion.min > javaVersion) return false;
   if (targetVersion.max && targetVersion.max < javaVersion) return false;
 
-  if (!targetVersion.min && !targetVersion.max)
+  if (!targetVersion.min && !targetVersion.max) {
     return targetVersion.optimal === javaVersion;
+  }
 
   return true;
 }
@@ -71,7 +93,7 @@ function tryMinecraftJava(dir: string, javaVersion: JavaVersion) {
   return false;
 }
 
-export default async function findJava(
+export async function findJava(
   targetVersion: JavaVersion,
   tempPath: string,
   downloadPath: string,
@@ -115,8 +137,9 @@ export default async function findJava(
     downloadedJavaPath,
     targetVersion
   );
-  if (isDownloadedJavaValid)
+  if (isDownloadedJavaValid) {
     return path.join(downloadedJavaPath, javaExecutable);
+  }
 
   await downloadJava(targetVersion, tempPath, downloadPath, progressCallback);
   return path.join(downloadedJavaPath, javaExecutable);
