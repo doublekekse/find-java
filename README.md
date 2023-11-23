@@ -14,7 +14,7 @@ If a suitable version of Java cannot be found, the utility will automatically in
 ## Usage
 
 ```javascript
-import findJava from 'find-java';
+import { findJava } from 'find-java';
 
 const javaPath = await findJava(
   { min: 17, optimal: 18 }, // If neither min or max are specified only the optimal version will be used
