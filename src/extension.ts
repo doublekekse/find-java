@@ -3,7 +3,6 @@ export default function extension(): string {
     case 'win32':
       return '.exe';
     case 'darwin':
-      return '';
     case 'linux':
       return '';
     default:

@@ -1,9 +1,9 @@
 import os from 'os';
 import fetch from 'node-fetch';
 import path from 'path';
-import { JavaVersion } from '.';
 import fs from 'fs';
-import AdmZip from 'adm-zip';
+import { extractFile } from './extract';
+import { cleanDirectory, ensureDirectoryExists } from './dir';
 
 type AdoptiumResponse = {
   binary: {
@@ -69,50 +69,42 @@ function mapPlatformToAdoptiumOS(): string {
   }
 }
 
-function getJavaZipFilepath(tempPath: string) {
-  const { platform } = process;
+function getJavaZipFilepath(tempPath: string, downloadUrl: string) {
   let extension = '';
 
-  switch (platform) {
-    case 'win32':
-      extension = 'zip';
-      break;
-    case 'darwin':
-      extension = 'dmg';
-      break;
-    case 'linux':
-      extension = 'tar.gz';
-      break;
-    default:
-      throw new Error(`Unsupported platform: ${platform}`);
+  if (downloadUrl.endsWith('.zip')) {
+    extension = '.zip';
+  } else if (downloadUrl.endsWith('.tar.gz')) {
+    extension = '.tar.gz';
+  } else {
+    throw new Error('Unsupported file type');
   }
 
-  const fileName = `jdk-latest.${extension}`;
+  const fileName = `jdk-latest${extension}`;
   return path.join(tempPath, fileName);
 }
 
 export type ProgressCallback = (progress: number) => void;
 
 export async function downloadJava(
-  targetVersion: JavaVersion,
+  targetVersion: number,
   tempPath: string,
   javaPath: string,
   progressCallback?: ProgressCallback
 ) {
-  if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath, { recursive: true });
-
-  if (fs.existsSync(javaPath)) fs.rmSync(javaPath, { recursive: true });
+  ensureDirectoryExists(tempPath);
+  cleanDirectory(javaPath);
 
   const platform = mapPlatformToAdoptiumOS();
   const architecture = process.arch;
   const imageType = 'jdk';
 
-  const url = `https://api.adoptium.net/v3/assets/latest/${targetVersion.optimal}/hotspot?architecture=${architecture}&image_type=${imageType}&os=${platform}&vendor=eclipse`;
+  const url = `https://api.adoptium.net/v3/assets/latest/${targetVersion}/hotspot?architecture=${architecture}&image_type=${imageType}&os=${platform}&vendor=eclipse`;
 
   const response = await fetch(url);
   const data = (await response.json()) as AdoptiumResponse;
   const downloadUrl = data[0].binary.package.link;
-  const filePath = getJavaZipFilepath(tempPath);
+  const filePath = getJavaZipFilepath(tempPath, downloadUrl);
 
   const fileStream = fs.createWriteStream(filePath);
   const downloadResponse = await fetch(downloadUrl);
@@ -124,10 +116,7 @@ export async function downloadJava(
       throw new Error('Download response body is null!');
     }
 
-    const totalSize = parseInt(
-      downloadResponse.headers.get('content-length') || '0',
-      10
-    );
+    const totalSize = parseInt(downloadResponse.headers.get('content-length') || '0', 10);
     let downloadedSize = 0;
 
     downloadResponse.body.on('error', (err: Error) => {
@@ -147,7 +136,7 @@ export async function downloadJava(
     downloadResponse.body.pipe(fileStream);
   });
 
-  await extractFolderFromZip(filePath, name, javaPath, targetVersion.optimal);
+  await extractFolderFromZip(filePath, name, javaPath, targetVersion);
 }
 
 async function extractFolderFromZip(
@@ -158,8 +147,10 @@ async function extractFolderFromZip(
 ) {
   const extractLocation = path.resolve(target);
 
-  const zip = new AdmZip(zipPath);
-  zip.extractAllTo(extractLocation, true);
+  ensureDirectoryExists(target);
+
+  await extractFile(zipPath, extractLocation);
+
   fs.unlinkSync(zipPath);
 
   const extractedFolderPath = path.join(extractLocation, folderInZip);

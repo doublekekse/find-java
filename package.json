@@ -13,15 +13,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/adm-zip": "^0.5.2",
-    "@types/node": "^20.8.3",
-    "@types/node-fetch": "^2.6.6",
-    "@typescript-eslint/eslint-plugin": "^6.7.4",
-    "@typescript-eslint/parser": "^6.7.4",
-    "eslint": "^8.51.0"
+    "@types/node": "^20.13.0",
+    "@types/node-fetch": "^2.6.11"
   },
   "dependencies": {
-    "adm-zip": "^0.5.10",
     "node-fetch": "^2.7.0"
   }
 }

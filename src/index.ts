@@ -1,5 +1,4 @@
 import path from 'path';
-// import fs from 'fs-extra';
 import fs from 'fs';
 import { execSync } from 'child_process';
 import extension from './extension';
@@ -41,6 +40,7 @@ function getJavaVersion(javaPath: string) {
   } catch (err) {
     // Java is not installed or an error occurred
   }
+
   return null;
 }
 
@@ -77,10 +77,8 @@ function tryMinecraftJava(dir: string, javaVersion: JavaVersion) {
     'runtime\\java-runtime-gamma\\windows-x86\\java-runtime-gamma\\bin',
   ];
 
-  for (let i = 0; i < javaPaths.length; i++) {
-    const jp = javaPaths[i];
-
-    const fullJavaPath = `${dir}\\${jp}`;
+  for (const javaPath of javaPaths) {
+    const fullJavaPath = `${dir}\\${javaPath}`;
 
     if (fs.existsSync(fullJavaPath)) {
       if (isValidJavaInstallation(fullJavaPath, javaVersion)) {
@@ -102,21 +100,25 @@ export async function findJava(
 ) {
   const javaExecutable = javaFile + extension();
 
-  // UWP launcher
+  // Minecraft launcher
   if (process.platform === 'win32') {
-    const localAppData = process.env.LOCALAPPDATA;
-    if (localAppData) {
-      const minecraftUwpJavaPath = path.join(
-        localAppData,
+    const launcherPaths = [
+      'C:\\Program Files (x86)\\Minecraft Launcher',
+      path.join(
+        process.env.LOCALAPPDATA!,
         'Packages/Microsoft.4297127D64EC6_8wekyb3d8bbwe/LocalCache/Local/'
-      );
-      const mcJava = tryMinecraftJava(minecraftUwpJavaPath, targetVersion);
+      ),
+    ];
+
+    for (const launcherPath of launcherPaths) {
+      const mcJava = tryMinecraftJava(launcherPath, targetVersion);
       if (mcJava) return path.join(mcJava, javaExecutable);
     }
   }
 
   // Java home
   const javaHome = process.env.JAVA_HOME;
+
   if (javaHome) {
     const javaHomePath = path.join(javaHome, 'bin');
     const isValid = isValidJavaInstallation(javaHome, targetVersion);
@@ -125,22 +127,18 @@ export async function findJava(
 
   // Getting thin on the ground, lets check the javaPath.
   const isMainJavaValid = isValidJavaInstallation('', targetVersion);
+
   if (isMainJavaValid) return javaExecutable;
 
-  const downloadedJavaPath = path.join(
-    downloadPath,
-    'java-' + targetVersion.optimal,
-    'bin'
-  );
+  const downloadedJavaPath = path.join(downloadPath, 'java-' + targetVersion.optimal, 'bin');
 
-  const isDownloadedJavaValid = isValidJavaInstallation(
-    downloadedJavaPath,
-    targetVersion
-  );
+  // Is a downloaded instance available
+  const isDownloadedJavaValid = isValidJavaInstallation(downloadedJavaPath, targetVersion);
   if (isDownloadedJavaValid) {
     return path.join(downloadedJavaPath, javaExecutable);
   }
 
-  await downloadJava(targetVersion, tempPath, downloadPath, progressCallback);
+  // Download java
+  await downloadJava(targetVersion.optimal, tempPath, downloadPath, progressCallback);
   return path.join(downloadedJavaPath, javaExecutable);
 }
