@@ -22,16 +22,16 @@ const javaPath = await findJava(
   'java-folder' // Path where the extracted Java will be stored
 );
 
-console.log(javaPath); // Example output: "javaw" or "C:\Users\User\AppData\Local\Packages\Microsoft.4297127D64EC6_8wekyb3d8bbwe\LocalCache\Local\runtime\java-runtime-beta\windows-x64\java-runtime-beta\bin\javaw.exe"
+console.log(javaPath); // Example output: "java" or "C:\Users\User\AppData\Local\Packages\Microsoft.4297127D64EC6_8wekyb3d8bbwe\LocalCache\Local\runtime\java-runtime-beta\windows-x64\java-runtime-beta\bin\java.exe"
 ```
 
-If you prefer the java executable instead of javaw, you can specify it in the function call:
+If you prefer a different java executable instead of java, you can specify it in the function call:
 ```javascript
 const javaPath = await findJava(
   { min: 17, optimal: 18 },
   'temp',
   'java-folder',
-  'java'
+  'javaw' // Note that javaw is not available on linux
 );
 ```
 

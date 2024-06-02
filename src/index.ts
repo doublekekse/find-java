@@ -22,14 +22,14 @@ export type JavaVersion = {
        * A function to resolve weather a java installation is valid. Use this if the min, max and optimal options are not enough
        *
        * @param {string} dir The directory the java executable is in (e.g. "C:\Program Files\Java\jdk-18.0.2.1\bin")
-       * @param {string} file The filename (e.g. "javaw.exe" or "javaw")
+       * @param {string} file The filename (e.g. "java.exe" or "java")
        */
       isValid: (dir: string, file: string) => boolean;
     }
 );
 
 function getJavaVersion(javaPath: string) {
-  if (!javaPath.startsWith('javaw') && !fs.existsSync(javaPath)) return null;
+  if (!javaPath.startsWith('java') && !fs.existsSync(javaPath)) return null;
 
   try {
     const output = execSync(`${javaPath} -version 2>&1`);
@@ -45,7 +45,7 @@ function getJavaVersion(javaPath: string) {
 }
 
 function isValidJavaInstallation(javaPath: string, targetVersion: JavaVersion) {
-  const file = 'javaw' + extension();
+  const file = 'java' + extension();
 
   if ('isValid' in targetVersion) return targetVersion.isValid(javaPath, file);
 
@@ -95,7 +95,7 @@ export async function findJava(
   targetVersion: JavaVersion,
   tempPath: string,
   downloadPath: string,
-  javaFile = 'javaw',
+  javaFile = 'java',
   progressCallback?: ProgressCallback
 ) {
   const javaExecutable = javaFile + extension();
