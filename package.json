@@ -1,5 +1,5 @@
 {
-  "name": "find-java",
+  "name": "@doublekekse/find-java",
   "type": "module",
   "version": "1.0.0",
   "description": "A utility to find or download Java",

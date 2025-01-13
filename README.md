@@ -8,7 +8,7 @@ If no compatible version of Java can be found, it will automatically download th
 
 ## Installation
 ```bash
-npm install github:doublekekse/find-java
+npm install @doublekekse/find-java
 ```
 
 ## Usage
