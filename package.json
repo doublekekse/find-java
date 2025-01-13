@@ -1,22 +1,31 @@
 {
   "name": "find-java",
+  "type": "module",
   "version": "1.0.0",
-  "description": "",
+  "description": "A utility to find or download Java",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doublekekse/find-java.git"
+  },
+  "keywords": [
+    "java",
+    "utility"
+  ],
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "prepare": "tsc"
+    "build": "unbuild",
+    "prepack": "unbuild"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.13.0",
-    "@types/node-fetch": "^2.6.11"
+    "@types/node": "^22.10.6",
+    "unbuild": "^3.3.1"
   },
   "dependencies": {
-    "node-fetch": "^2.7.0"
-  }
+    "node-fetch": "^3.3.2"
+  },
+  "license": "MIT"
 }

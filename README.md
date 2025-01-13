@@ -1,50 +1,55 @@
-# Find Java
+# `find-java`
+`find-java` helps you to locate a compatible version of Java on the system. It searches within commonly used directories, including:
+- The Java home directory
+- The Minecraft Launcher directory
+- The Minecraft UWP Launcher directory
 
-Find java will locate a compatible version of Java within commonly used directories, including:
-- The minecraft launcher folder
-- The minecraft uwp launcher folder
-- The java home directory
-
-If a suitable version of Java cannot be found, the utility will automatically initiate the download process.
+If no compatible version of Java can be found, it will automatically download the required version of Java.
 
 ## Installation
-
-`npm i github:doublekekse/find-java`
+```bash
+npm install github:doublekekse/find-java
+```
 
 ## Usage
-
-```javascript
+```js
 import { findJava } from 'find-java';
 
 const javaPath = await findJava(
-  { min: 17, optimal: 18 }, // If neither min or max are specified only the optimal version will be used
-  'temp', // Path where the downloaded Java ZIP will temporarily reside
-  'java-folder' // Path where the extracted Java will be stored
-);
-
-console.log(javaPath); // Example output: "java" or "C:\Users\User\AppData\Local\Packages\Microsoft.4297127D64EC6_8wekyb3d8bbwe\LocalCache\Local\runtime\java-runtime-beta\windows-x64\java-runtime-beta\bin\java.exe"
-```
-
-If you prefer a different java executable instead of java, you can specify it in the function call:
-```javascript
-const javaPath = await findJava(
+  // The required Java version
   { min: 17, optimal: 18 },
-  'temp',
-  'java-folder',
-  'javaw' // Note that javaw is not available on linux
+
+  // Path where the required version will temporarily be downloaded and extracted to
+  'tmp',
+
+  // Path where Java should be installed to
+  'java-dir'
 );
 ```
 
-`findJava` also provides a callback to track download progress using a callback
+You can also specify a different Java executable instead of `java`, like `javaw`:
 
-```javascript
+```js
 const javaPath = await findJava(
   { min: 17, optimal: 18 },
-  'temp',
-  'java-folder',
-  undefined,
+  'tmp',
+  'java-dir',
+  'javaw'
+);
+```
+
+Note that `javaw` is only available on Windows.
+
+Finally, you can specify a callback function to track the download progress:
+
+```js
+const javaPath = await findJava(
+  { min: 17, optimal: 18 },
+  'tmp',
+  'java-dir',
+  'java',
   (progress) => {
-    console.log(progress * 100);
+    console.log(`Downloading Java: ${progress * 100}%`);
   }
 );
 ```
