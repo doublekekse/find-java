@@ -1,7 +1,7 @@
-import os from 'os';
+import os from 'node:os';
 import fetch from 'node-fetch';
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 import { extractFile } from './extract';
 
 /**
