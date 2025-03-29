@@ -20,6 +20,12 @@
     "build": "unbuild",
     "prepack": "unbuild"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
   "devDependencies": {
     "@types/node": "^22.10.6",
     "unbuild": "^3.3.1"
